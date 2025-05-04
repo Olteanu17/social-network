@@ -1,0 +1,74 @@
+.posts-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+h2, h4 {
+    text-align: center;
+}
+
+.error {
+    color: red;
+    text-align: center;
+}
+
+.success {
+    color: green;
+    text-align: center;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+textarea, input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+textarea {
+    height: 100px;
+}
+
+button {
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin: 5px;
+}
+
+button:hover {
+    background-color: #218838;
+}
+
+.posts-list {
+    margin-top: 20px;
+}
+
+.post {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.likes-section, .tags-section {
+    margin-top: 10px;
+}
+
+.comments-section {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.comment {
+    border-top: 1px solid #eee;
+    padding: 5px 0;
+}
