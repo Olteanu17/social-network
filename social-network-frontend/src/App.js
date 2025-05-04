@@ -1,24 +1,48 @@
-import React, { useEffect, useState } from 'react';
-import './App.css';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Register from './components/Register';
+import Login from './components/Login';
+import Home from './components/Home';
+import Posts from './components/Posts';
+import Messages from './components/Messages';
+import Profile from './components/Profile';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    fetch('http://localhost:8080/hello')
-        .then(response => response.text())
-        .then(data => setMessage(data))
-        .catch(error => console.error('Error:', error));
-  }, []);
-
-  return (
-      <div className="App">
-        <header className="App-header">
-          <h1>Social Network</h1>
-          <p>{message || 'Loading...'}</p>
-        </header>
-      </div>
-  );
+    return (
+        <Router>
+            <Navbar />
+            <Routes>
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/home" element={<Home />} />
+                <Route
+                    path="/posts"
+                    element={
+                        <ProtectedRoute>
+                            <Posts />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/messages"
+                    element={
+                        <ProtectedRoute>
+                            <Messages />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile/:userId"
+                    element={
+                        <ProtectedRoute>
+                            <Profile />
+                        </ProtectedRoute>
+                    }
+                />
+            </Routes>
+        </Router>
+    );
 }
 
 export default App;

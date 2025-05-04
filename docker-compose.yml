@@ -5,19 +5,21 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/social_network_db
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=parola
-
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_SHOW_SQL=true
+      - SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT=org.hibernate.dialect.PostgreSQLDialect
   frontend:
     build: ./social-network-frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
-
   db:
     image: postgres:15
     ports:
@@ -28,6 +30,10 @@ services:
       - POSTGRES_DB=social_network_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 volumes:
   postgres_data:
