@@ -2,20 +2,25 @@
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
+    font-family: Arial, sans-serif;
 }
 
-h2, h4 {
+h2 {
     text-align: center;
+    color: #873260;
+    margin-bottom: 20px;
 }
 
 .error {
     color: red;
     text-align: center;
+    margin-bottom: 10px;
 }
 
 .success {
     color: green;
     text-align: center;
+    margin-bottom: 10px;
 }
 
 form {
@@ -25,27 +30,59 @@ form {
 textarea, input {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #873260;
     border-radius: 4px;
     margin-bottom: 10px;
+    box-sizing: border-box;
 }
 
 textarea {
     height: 100px;
+    resize: vertical;
+}
+
+textarea:focus, input:focus {
+    outline: none;
+    border-color: #E0B0FF;
 }
 
 button {
     padding: 10px;
-    background-color: #28a745;
-    color: white;
+    background-color: #E0B0FF; /* Mauve color for all buttons */
+    color: #873260; /* Boysenberry text */
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 5px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #D8A0F0; /* Darker mauve on hover */
+}
+
+.small-button {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.post-meta {
+    background-color: #873260; /* Same as navbar */
+    color: #FFFFFF;
+    padding: 5px 10px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.action-buttons-container {
+    background-color: #F5F5F5; /* Light gray container for buttons */
+    padding: 10px;
+    border-radius: 4px;
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
 }
 
 .posts-list {
@@ -53,22 +90,47 @@ button:hover {
 }
 
 .post {
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-bottom: 10px;
+    border: 1px solid #873260;
+    padding: 15px;
+    margin-bottom: 15px;
     border-radius: 4px;
+    background-color: #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.likes-section, .tags-section {
+.tags-section {
     margin-top: 10px;
 }
 
 .comments-section {
+    background-color: #873260; /* Same as navbar */
+    color: #FFFFFF;
+    padding: 10px;
+    border-radius: 4px;
     margin-top: 10px;
-    padding-left: 20px;
 }
 
 .comment {
-    border-top: 1px solid #eee;
+    border-top: 1px solid #FFFFFF;
     padding: 5px 0;
+}
+
+.comment:first-child {
+    border-top: none;
+}
+
+.filter-button {
+    display: block;
+    margin: 20px auto 0;
+    padding: 10px 20px;
+    background-color: #E0B0FF;
+    color: #873260;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filter-button:hover {
+    background-color: #D8A0F0;
 }

@@ -9,15 +9,26 @@ function Posts() {
     const [success, setSuccess] = useState('');
     const [commentContent, setCommentContent] = useState({});
     const [tagContent, setTagContent] = useState({});
+    const [showTagForm, setShowTagForm] = useState({});
+    const [showCommentForm, setShowCommentForm] = useState({});
 
     const fetchPosts = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/posts', {
                 withCredentials: true
             });
-            setPosts(response.data);
+            const postsData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            setPosts(postsData);
+
+            for (const post of postsData) {
+                await Promise.all([
+                    fetchLikes(post.id),
+                    fetchTags(post.id),
+                    fetchComments(post.id)
+                ]);
+            }
         } catch (error) {
-            setError('Failed to load posts');
+            setError(error.response?.data || 'Failed to load posts');
         }
     };
 
@@ -30,7 +41,7 @@ function Posts() {
                 post.id === postId ? { ...post, comments: response.data } : post
             ));
         } catch (error) {
-            setError('Failed to load comments');
+            setError('Comments functionality is not implemented yet');
         }
     };
 
@@ -92,7 +103,7 @@ function Posts() {
             setCommentContent(prev => ({ ...prev, [postId]: '' }));
             fetchComments(postId);
         } catch (error) {
-            setError(error.response?.data || 'Failed to create comment');
+            setError('Comments functionality is not implemented yet');
         }
     };
 
@@ -139,6 +150,14 @@ function Posts() {
         }
     };
 
+    const toggleTagForm = (postId) => {
+        setShowTagForm(prev => ({ ...prev, [postId]: !prev[postId] }));
+    };
+
+    const toggleCommentForm = (postId) => {
+        setShowCommentForm(prev => ({ ...prev, [postId]: !prev[postId] }));
+    };
+
     useEffect(() => {
         fetchPosts();
     }, []);
@@ -163,49 +182,55 @@ function Posts() {
                 {posts.map(post => (
                     <div key={post.id} className="post">
                         <p><strong>{post.user.username}</strong>: {post.content}</p>
-                        <p>{new Date(post.createdAt).toLocaleString()}</p>
-                        <div className="likes-section">
-                            <p>Likes: {post.likes ? post.likes.length : 0}</p>
-                            <button onClick={() => handleLikePost(post.id)}>Like</button>
-                            <button onClick={() => handleUnlikePost(post.id)}>Unlike</button>
-                            <button onClick={() => fetchLikes(post.id)}>Load Likes</button>
+                        <div className="post-meta">
+                            <span>{new Date(post.createdAt).toLocaleString()}</span>
+                            <span>Likes: {post.likes ? post.likes.length : 0}</span>
                         </div>
-                        <div className="tags-section">
-                            <p>Tags: {post.tags ? post.tags.map(tag => tag.name).join(', ') : 'None'}</p>
-                            <button onClick={() => fetchTags(post.id)}>Load Tags</button>
-                            <form onSubmit={(e) => handleAddTag(e, post.id)}>
-                                <input
-                                    type="text"
-                                    value={tagContent[post.id] || ''}
-                                    onChange={(e) => setTagContent(prev => ({ ...prev, [post.id]: e.target.value }))}
-                                    placeholder="Add a tag..."
-                                    required
-                                />
-                                <button type="submit">Add Tag</button>
-                            </form>
+                        <div className="action-buttons-container">
+                            <button className="small-button" onClick={() => handleLikePost(post.id)}>Like</button>
+                            <button className="small-button" onClick={() => handleUnlikePost(post.id)}>Dislike</button>
+                            <button className="small-button" onClick={() => toggleTagForm(post.id)}>Add Tag</button>
+                            <button className="small-button" onClick={() => toggleCommentForm(post.id)}>Add Comment</button>
                         </div>
-                        <div className="comments-section">
-                            <h4>Comments</h4>
-                            <button onClick={() => fetchComments(post.id)}>Load Comments</button>
-                            {post.comments && post.comments.map(comment => (
-                                <div key={comment.id} className="comment">
-                                    <p><strong>{comment.user.username}</strong>: {comment.content}</p>
-                                    <p>{new Date(comment.createdAt).toLocaleString()}</p>
-                                </div>
-                            ))}
-                            <form onSubmit={(e) => handleCreateComment(e, post.id)}>
-                                <textarea
-                                    value={commentContent[post.id] || ''}
-                                    onChange={(e) => setCommentContent(prev => ({ ...prev, [post.id]: e.target.value }))}
-                                    placeholder="Add a comment..."
-                                    required
-                                />
-                                <button type="submit">Comment</button>
-                            </form>
-                        </div>
+                        {showTagForm[post.id] && (
+                            <div className="tags-section">
+                                <form onSubmit={(e) => handleAddTag(e, post.id)}>
+                                    <input
+                                        type="text"
+                                        value={tagContent[post.id] || ''}
+                                        onChange={(e) => setTagContent(prev => ({ ...prev, [post.id]: e.target.value }))}
+                                        placeholder="Add a tag..."
+                                        required
+                                    />
+                                    <button type="submit">Submit Tag</button>
+                                </form>
+                            </div>
+                        )}
+                        {showCommentForm[post.id] && (
+                            <div className="comments-section">
+                                {post.comments && post.comments.length > 0 ? (
+                                    post.comments.map(comment => (
+                                        <div key={comment.id} className="comment">
+                                            <p><strong>{comment.user.username}</strong>: {comment.content}</p>
+                                            <p>{new Date(comment.createdAt).toLocaleString()}</p>
+                                        </div>
+                                    ))
+                                ) : null}
+                                <form onSubmit={(e) => handleCreateComment(e, post.id)}>
+                                    <textarea
+                                        value={commentContent[post.id] || ''}
+                                        onChange={(e) => setCommentContent(prev => ({ ...prev, [post.id]: e.target.value }))}
+                                        placeholder="Add a comment..."
+                                        required
+                                    />
+                                    <button type="submit">Submit Comment</button>
+                                </form>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>
+            <button className="filter-button" onClick={() => {/* Implement tag filtering logic */}}>Filter by Tag</button>
         </div>
     );
 }

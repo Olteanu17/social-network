@@ -1,38 +1,55 @@
+body {
+  background-color: #FFFFFF; /* Fundal alb */
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
 .App {
   text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+  color: #873260; /* Boysenberry pentru textul principal */
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #873260; /* Boysenberry */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #FFFFFF; /* Alb pentru text */
 }
 
 .App-link {
-  color: #61dafb;
+  color: #E0B0FF; /* Mauve pentru link-uri */
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+h2, h3, h4 {
+  color: #873260; /* Boysenberry pentru titluri */
+}
+
+button:not(.logout-button) {
+  background-color: #873260; /* Boysenberry pentru alte butoane */
+  color: #FFFFFF; /* Alb pentru text */
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+button:not(.logout-button):hover {
+  background-color: #6B2749; /* Boysenberry mai închis pentru hover */
+}
+
+textarea, input {
+  border: 1px solid #873260; /* Bordură boysenberry */
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 16px;
+}
+
+textarea:focus, input:focus {
+  outline: none;
+  border-color: #E0B0FF; /* Mauve pentru focus */
 }

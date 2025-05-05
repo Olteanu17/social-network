@@ -1,32 +1,35 @@
 .navbar {
-    background-color: #007bff;
-    padding: 10px;
+    background-color: #873260; /* Boysenberry */
+    padding: 15px;
     display: flex;
     justify-content: space-around;
     align-items: center;
 }
 
 .navbar a {
-    color: white;
+    color: #FFFFFF; /* Alb pentru link-uri */
     text-decoration: none;
-    padding: 10px;
-    font-weight: bold;
+    font-size: 18px;
+    padding: 10px 15px;
+    transition: background-color 0.3s;
 }
 
 .navbar a:hover {
-    background-color: #0056b3;
-    border-radius: 4px;
+    background-color: #6B2749; /* Boysenberry mai închis pentru hover */
+    border-radius: 5px;
 }
 
-.navbar button {
-    padding: 10px;
-    background-color: #dc3545;
-    color: white;
+.logout-button {
+    background-color: #E0B0FF; /* Mauve */
+    color: #873260; /* Boysenberry pentru text */
     border: none;
-    border-radius: 4px;
+    padding: 10px 20px;
+    font-size: 16px;
     cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
 }
 
-.navbar button:hover {
-    background-color: #c82333;
+.logout-button:hover {
+    background-color: #D8A0F0; /* Mauve mai închis pentru hover */
 }
