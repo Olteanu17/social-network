@@ -3,11 +3,13 @@
     margin: 50px auto;
     padding: 20px;
     font-family: Arial, sans-serif;
+    background-color: #C8A2C8; /* Jacaranda mov/roz */
+    border-radius: 8px;
 }
 
 h2 {
     text-align: center;
-    color: #873260;
+    color: #873260; /* Boysenberry */
     margin-bottom: 20px;
 }
 
@@ -23,8 +25,32 @@ h2 {
     margin-bottom: 10px;
 }
 
+.top-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.create-post-button, .filter-button {
+    padding: 10px 20px;
+    background-color: #E0B0FF; /* Mauve */
+    color: #873260; /* Boysenberry */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 16px;
+}
+
+.create-post-button:hover, .filter-button:hover {
+    background-color: #D8A0F0; /* Mauve mai închis */
+}
+
 form {
     margin-bottom: 20px;
+    background-color: #F5F5F5; /* Fundal gri deschis pentru formular */
+    padding: 15px;
+    border-radius: 4px;
 }
 
 textarea, input {
@@ -52,8 +78,8 @@ textarea:focus, input:focus {
 
 button {
     padding: 10px;
-    background-color: #E0B0FF; /* Mauve color for all buttons */
-    color: #873260; /* Boysenberry text */
+    background-color: #E0B0FF; /* Mauve pentru toate butoanele */
+    color: #873260; /* Boysenberry */
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -61,7 +87,7 @@ button {
 }
 
 button:hover {
-    background-color: #D8A0F0; /* Darker mauve on hover */
+    background-color: #D8A0F0; /* Mauve mai închis */
 }
 
 .small-button {
@@ -70,18 +96,18 @@ button:hover {
 }
 
 .post-meta {
-    background-color: #873260; /* Same as navbar */
+    background-color: #873260; /* Boysenberry */
     color: #FFFFFF;
     padding: 5px 10px;
     border-radius: 4px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 .action-buttons-container {
-    background-color: #F5F5F5; /* Light gray container for buttons */
+    background-color: #F5F5F5; /* Gri deschis */
     padding: 10px;
     border-radius: 4px;
     display: flex;
@@ -102,10 +128,22 @@ button:hover {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.post-content {
+    background-color: #F5F5F5; /* Fundal gri deschis pentru text */
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px; /* Spațiu între text și imagine */
+}
+
+.post-image-container {
+    display: flex;
+    justify-content: center; /* Centrează imaginea */
+    margin-top: 10px;
+}
+
 .post-image {
     max-width: 100%;
     height: auto;
-    margin-top: 10px;
     border-radius: 4px;
 }
 
@@ -114,7 +152,7 @@ button:hover {
 }
 
 .comments-section {
-    background-color: #873260; /* Same as navbar */
+    background-color: #873260; /* Boysenberry */
     color: #FFFFFF;
     padding: 10px;
     border-radius: 4px;
@@ -128,20 +166,4 @@ button:hover {
 
 .comment:first-child {
     border-top: none;
-}
-
-.filter-button {
-    display: block;
-    margin: 20px auto 0;
-    padding: 10px 20px;
-    background-color: #E0B0FF;
-    color: #873260;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.filter-button:hover {
-    background-color: #D8A0F0;
 }

@@ -7,7 +7,7 @@
 }
 
 .navbar a {
-    color: #FFFFFF; /* Alb pentru link-uri */
+    color: #FFFFFF;
     text-decoration: none;
     font-size: 18px;
     padding: 10px 15px;
@@ -15,21 +15,21 @@
 }
 
 .navbar a:hover {
-    background-color: #6B2749; /* Boysenberry mai închis pentru hover */
+    background-color: #6B2749; /* Boysenberry mai închis */
     border-radius: 5px;
 }
 
 .logout-button {
     background-color: #E0B0FF; /* Mauve */
-    color: #873260; /* Boysenberry pentru text */
+    color: #873260; /* Boysenberry */
     border: none;
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 8px 12px; /* Redus pentru a fi mai scurt */
+    font-size: 14px; /* Font mai mic */
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s;
 }
 
 .logout-button:hover {
-    background-color: #D8A0F0; /* Mauve mai închis pentru hover */
+    background-color: #D8A0F0; /* Mauve mai închis */
 }

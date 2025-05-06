@@ -36,7 +36,7 @@ function Navbar() {
     };
 
     if (loading) {
-        return null; // Evită afișarea navbar-ului până când starea autentificării este clară
+        return null;
     }
 
     return (
@@ -46,8 +46,8 @@ function Navbar() {
             {!isAuthenticated && <Link to="/login">Login</Link>}
             <Link to="/posts">Posts</Link>
             <Link to="/messages">Messages</Link>
-            <Link to="/profile/1">Profile</Link> {/* TODO: Ajustează cu ID dinamic */}
-            {isAuthenticated && <button className="logout-button" onClick={handleLogout}>Logout</button>}
+            <Link to="/profile/1">Profile</Link>
+            {isAuthenticated && <button className="logout-button" onClick={handleLogout}>Log Out</button>}
         </nav>
     );
 }

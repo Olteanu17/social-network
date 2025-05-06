@@ -12,6 +12,7 @@ function Posts() {
     const [tagContent, setTagContent] = useState({});
     const [showTagForm, setShowTagForm] = useState({});
     const [showCommentForm, setShowCommentForm] = useState({});
+    const [showCreatePostForm, setShowCreatePostForm] = useState(false);
 
     const fetchPosts = async () => {
         try {
@@ -92,7 +93,7 @@ function Posts() {
             setContent('');
             setImageFile(null);
             document.getElementById('imageInput').value = '';
-            // Adaugă postarea nouă în stare imediat
+            setShowCreatePostForm(false); // Ascunde formularul după postare
             setPosts(prevPosts => [response.data, ...prevPosts]);
         } catch (error) {
             console.error('Upload error:', error.response?.data, error.message);
@@ -178,35 +179,49 @@ function Posts() {
             <h2>Posts</h2>
             {error && <p className="error">{error}</p>}
             {success && <p className="success">{success}</p>}
-            <form onSubmit={handleCreatePost} encType="multipart/form-data">
-                <div>
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder="What's on your mind?"
-                        required
-                    />
-                    <input
-                        id="imageInput"
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => setImageFile(e.target.files[0])}
-                        className="image-input"
-                    />
-                </div>
-                <button type="submit">Post</button>
-            </form>
+            <div className="top-buttons">
+                <button className="create-post-button" onClick={() => setShowCreatePostForm(!showCreatePostForm)}>
+                    {showCreatePostForm ? 'Hide Form' : 'Create Post'}
+                </button>
+                <button className="filter-button" onClick={() => {/* Implement tag filtering logic */}}>
+                    Filter by Tag
+                </button>
+            </div>
+            {showCreatePostForm && (
+                <form onSubmit={handleCreatePost} encType="multipart/form-data">
+                    <div>
+                        <textarea
+                            value={content}
+                            onChange={(e) => setContent(e.target.value)}
+                            placeholder="What's on your mind?"
+                            required
+                        />
+                        <input
+                            id="imageInput"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setImageFile(e.target.files[0])}
+                            className="image-input"
+                        />
+                    </div>
+                    <button type="submit">Post</button>
+                </form>
+            )}
             <div className="posts-list">
                 {posts.map(post => (
                     <div key={post.id} className="post">
-                        <p><strong>{post.user.username}</strong>: {post.content}</p>
+                        <div className="post-content">
+                            <p><strong>{post.user.username}</strong>: {post.content}</p>
+                        </div>
                         {post.imageUrl && (
-                            <img
-                                src={post.imageUrl}
-                                alt={`${post.user.username}'s post`}
-                                className="post-image"
-                                onError={(e) => console.error('Image failed to load:', post.imageUrl)}
-                            />
+                            <div className="post-image-container">
+                                <img
+                                    src={post.imageUrl}
+                                    alt={`${post.user.username}'s post`}
+                                    className="post-image"
+                                    onError={(e) => console.error('Image failed to load:', post.imageUrl)}
+                                />
+                            </div>
                         )}
                         <div className="post-meta">
                             <span>{new Date(post.createdAt).toLocaleString()}</span>
@@ -228,7 +243,7 @@ function Posts() {
                                         placeholder="Add a tag..."
                                         required
                                     />
-                                    <button type="submit">Submit Tag</button>
+                                    <button type="submit" className="small-button">Submit Tag</button>
                                 </form>
                             </div>
                         )}
@@ -249,14 +264,13 @@ function Posts() {
                                         placeholder="Add a comment..."
                                         required
                                     />
-                                    <button type="submit">Submit Comment</button>
+                                    <button type="submit" className="small-button">Submit Comment</button>
                                 </form>
                             </div>
                         )}
                     </div>
                 ))}
             </div>
-            <button className="filter-button" onClick={() => {/* Implement tag filtering logic */}}>Filter by Tag</button>
         </div>
     );
 }
