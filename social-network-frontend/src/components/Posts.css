@@ -41,6 +41,10 @@ textarea {
     resize: vertical;
 }
 
+.image-input {
+    padding: 5px;
+}
+
 textarea:focus, input:focus {
     outline: none;
     border-color: #E0B0FF;
@@ -96,6 +100,13 @@ button:hover {
     border-radius: 4px;
     background-color: #FFFFFF;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post-image {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 4px;
 }
 
 .tags-section {

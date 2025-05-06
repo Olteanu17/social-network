@@ -4,6 +4,7 @@ import './Posts.css';
 
 function Posts() {
     const [content, setContent] = useState('');
+    const [imageFile, setImageFile] = useState(null);
     const [posts, setPosts] = useState([]);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
@@ -77,14 +78,24 @@ function Posts() {
         setSuccess('');
 
         try {
+            const formData = new FormData();
+            formData.append('content', content);
+            if (imageFile) {
+                formData.append('image', imageFile);
+            }
+
             const response = await axios.post('http://localhost:8080/api/posts',
-                { content },
+                formData,
                 { withCredentials: true }
             );
-            setSuccess(response.data);
+            setSuccess('Post created successfully');
             setContent('');
-            fetchPosts();
+            setImageFile(null);
+            document.getElementById('imageInput').value = '';
+            // Adaugă postarea nouă în stare imediat
+            setPosts(prevPosts => [response.data, ...prevPosts]);
         } catch (error) {
+            console.error('Upload error:', error.response?.data, error.message);
             setError(error.response?.data || 'Failed to create post');
         }
     };
@@ -167,13 +178,20 @@ function Posts() {
             <h2>Posts</h2>
             {error && <p className="error">{error}</p>}
             {success && <p className="success">{success}</p>}
-            <form onSubmit={handleCreatePost}>
+            <form onSubmit={handleCreatePost} encType="multipart/form-data">
                 <div>
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         placeholder="What's on your mind?"
                         required
+                    />
+                    <input
+                        id="imageInput"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setImageFile(e.target.files[0])}
+                        className="image-input"
                     />
                 </div>
                 <button type="submit">Post</button>
@@ -182,6 +200,14 @@ function Posts() {
                 {posts.map(post => (
                     <div key={post.id} className="post">
                         <p><strong>{post.user.username}</strong>: {post.content}</p>
+                        {post.imageUrl && (
+                            <img
+                                src={post.imageUrl}
+                                alt={`${post.user.username}'s post`}
+                                className="post-image"
+                                onError={(e) => console.error('Image failed to load:', post.imageUrl)}
+                            />
+                        )}
                         <div className="post-meta">
                             <span>{new Date(post.createdAt).toLocaleString()}</span>
                             <span>Likes: {post.likes ? post.likes.length : 0}</span>
