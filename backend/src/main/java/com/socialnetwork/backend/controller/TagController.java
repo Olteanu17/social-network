@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/tags")
@@ -92,6 +94,15 @@ public class TagController {
                 .filter(postTag -> postTag.getPostId().equals(postId))
                 .map(PostTag::getTag)
                 .toList());
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getAllTags() {
+        List<String> tagNames = tagRepository.findAll().stream()
+                .map(Tag::getName)
+                .distinct()
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(tagNames);
     }
 }
 

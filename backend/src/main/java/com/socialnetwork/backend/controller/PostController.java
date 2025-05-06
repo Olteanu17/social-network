@@ -2,8 +2,12 @@ package com.socialnetwork.backend.controller;
 
 import com.socialnetwork.backend.model.Post;
 import com.socialnetwork.backend.model.User;
+import com.socialnetwork.backend.model.Tag;
+import com.socialnetwork.backend.model.PostTag;
 import com.socialnetwork.backend.repository.PostRepository;
 import com.socialnetwork.backend.repository.UserRepository;
+import com.socialnetwork.backend.repository.TagRepository;
+import com.socialnetwork.backend.repository.PostTagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -15,6 +19,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +30,12 @@ public class PostController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Autowired
+    private PostTagRepository postTagRepository;
 
     @PostMapping
     public ResponseEntity<?> createPost(
@@ -44,9 +55,7 @@ public class PostController {
 
         if (image != null && !image.isEmpty()) {
             try {
-                // Salvează imaginea ca date binare
                 post.setImageData(image.getBytes());
-                // Salvează tipul MIME
                 post.setImageUrl(image.getContentType());
             } catch (IOException e) {
                 e.printStackTrace();
@@ -55,7 +64,6 @@ public class PostController {
         }
 
         Post savedPost = postRepository.save(post);
-        // Convertește imageData în Base64 pentru răspuns
         if (savedPost.getImageData() != null) {
             String base64Image = Base64.getEncoder().encodeToString(savedPost.getImageData());
             savedPost.setImageUrl("data:" + savedPost.getImageUrl() + ";base64," + base64Image);
@@ -66,7 +74,6 @@ public class PostController {
     @GetMapping
     public ResponseEntity<?> getPosts() {
         List<Post> posts = postRepository.findAll();
-        // Convertește imageData în Base64 pentru fiecare postare
         List<Post> postsWithBase64 = posts.stream().map(post -> {
             if (post.getImageData() != null) {
                 String base64Image = Base64.getEncoder().encodeToString(post.getImageData());
@@ -74,6 +81,59 @@ public class PostController {
             }
             return post;
         }).collect(Collectors.toList());
+        return ResponseEntity.ok(postsWithBase64);
+    }
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterPostsByTags(@RequestParam(required = false) List<String> tags) {
+        if (tags == null || tags.isEmpty()) {
+            return getPosts(); // Returnează toate postările dacă nu sunt tag-uri
+        }
+
+        // Găsește ID-urile tag-urilor
+        List<Tag> tagEntities = tagRepository.findAll().stream()
+                .filter(tag -> tags.contains(tag.getName()))
+                .collect(Collectors.toList());
+
+        if (tagEntities.size() != tags.size()) {
+            return ResponseEntity.badRequest().body("One or more tags not found");
+        }
+
+        // Găsește postările care au toate tag-urile specificate
+        List<PostTag> postTags = postTagRepository.findAll();
+        Set<Long> postIds = null;
+        for (Tag tag : tagEntities) {
+            Set<Long> currentPostIds = postTags.stream()
+                    .filter(pt -> pt.getTagId().equals(tag.getId()))
+                    .map(PostTag::getPostId)
+                    .collect(Collectors.toSet());
+            if (postIds == null) {
+                postIds = currentPostIds;
+            } else {
+                postIds.retainAll(currentPostIds); // Intersecție
+            }
+            if (postIds.isEmpty()) {
+                break; // Nu există postări cu toate tag-urile
+            }
+        }
+
+        // Obține postările
+        List<Post> filteredPosts;
+        if (postIds == null || postIds.isEmpty()) {
+            filteredPosts = List.of(); // Listă goală dacă nu există postări
+        } else {
+            filteredPosts = postRepository.findAllById(postIds);
+        }
+
+        // Convertește imaginile în Base64
+        List<Post> postsWithBase64 = filteredPosts.stream().map(post -> {
+            if (post.getImageData() != null) {
+                String base64Image = Base64.getEncoder().encodeToString(post.getImageData());
+                post.setImageUrl("data:" + post.getImageUrl() + ";base64," + base64Image);
+            }
+            return post;
+        }).collect(Collectors.toList());
+
         return ResponseEntity.ok(postsWithBase64);
     }
 }

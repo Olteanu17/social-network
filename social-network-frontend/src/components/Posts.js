@@ -13,12 +13,16 @@ function Posts() {
     const [showTagForm, setShowTagForm] = useState({});
     const [showCommentForm, setShowCommentForm] = useState({});
     const [showCreatePostForm, setShowCreatePostForm] = useState(false);
+    const [showFilterTags, setShowFilterTags] = useState(false);
+    const [allTags, setAllTags] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
 
     const fetchPosts = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/posts', {
-                withCredentials: true
-            });
+            const url = selectedTags.length > 0
+                ? `http://localhost:8080/api/posts/filter?tags=${selectedTags.join('&tags=')}`
+                : 'http://localhost:8080/api/posts';
+            const response = await axios.get(url, { withCredentials: true });
             const postsData = response.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             setPosts(postsData);
 
@@ -73,6 +77,17 @@ function Posts() {
         }
     };
 
+    const fetchAllTags = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/tags', {
+                withCredentials: true
+            });
+            setAllTags(response.data);
+        } catch (error) {
+            setError('Failed to load tags');
+        }
+    };
+
     const handleCreatePost = async (e) => {
         e.preventDefault();
         setError('');
@@ -93,7 +108,7 @@ function Posts() {
             setContent('');
             setImageFile(null);
             document.getElementById('imageInput').value = '';
-            setShowCreatePostForm(false); // Ascunde formularul după postare
+            setShowCreatePostForm(false);
             setPosts(prevPosts => [response.data, ...prevPosts]);
         } catch (error) {
             console.error('Upload error:', error.response?.data, error.message);
@@ -157,6 +172,7 @@ function Posts() {
             setSuccess(response.data);
             setTagContent(prev => ({ ...prev, [postId]: '' }));
             fetchTags(postId);
+            fetchAllTags(); // Actualizează lista de tag-uri
         } catch (error) {
             setError(error.response?.data || 'Failed to add tag');
         }
@@ -170,9 +186,18 @@ function Posts() {
         setShowCommentForm(prev => ({ ...prev, [postId]: !prev[postId] }));
     };
 
+    const handleTagSelection = (tag) => {
+        setSelectedTags(prev =>
+            prev.includes(tag)
+                ? prev.filter(t => t !== tag)
+                : [...prev, tag]
+        );
+    };
+
     useEffect(() => {
         fetchPosts();
-    }, []);
+        fetchAllTags();
+    }, [selectedTags]);
 
     return (
         <div className="posts-container">
@@ -183,10 +208,29 @@ function Posts() {
                 <button className="create-post-button" onClick={() => setShowCreatePostForm(!showCreatePostForm)}>
                     {showCreatePostForm ? 'Hide Form' : 'Create Post'}
                 </button>
-                <button className="filter-button" onClick={() => {/* Implement tag filtering logic */}}>
-                    Filter by Tag
+                <button className="filter-button" onClick={() => setShowFilterTags(!showFilterTags)}>
+                    {showFilterTags ? 'Hide Filters' : 'Filter by Tag'}
                 </button>
             </div>
+            {showFilterTags && (
+                <div className="filter-tags">
+                    <h3>Select Tags</h3>
+                    {allTags.length > 0 ? (
+                        allTags.map(tag => (
+                            <label key={tag} className="tag-checkbox">
+                                <input
+                                    type="checkbox"
+                                    checked={selectedTags.includes(tag)}
+                                    onChange={() => handleTagSelection(tag)}
+                                />
+                                {tag}
+                            </label>
+                        ))
+                    ) : (
+                        <p>No tags available</p>
+                    )}
+                </div>
+            )}
             {showCreatePostForm && (
                 <form onSubmit={handleCreatePost} encType="multipart/form-data">
                     <div>
@@ -204,7 +248,7 @@ function Posts() {
                             className="image-input"
                         />
                     </div>
-                    <button type="submit">Post</button>
+                    <button type="submit" className="small-button">Post</button>
                 </form>
             )}
             <div className="posts-list">
@@ -235,6 +279,11 @@ function Posts() {
                         </div>
                         {showTagForm[post.id] && (
                             <div className="tags-section">
+                                {post.tags && post.tags.length > 0 && (
+                                    <div className="existing-tags">
+                                        <p>Existing Tags: {post.tags.map(tag => tag.name).join(', ')}</p>
+                                    </div>
+                                )}
                                 <form onSubmit={(e) => handleAddTag(e, post.id)}>
                                     <input
                                         type="text"

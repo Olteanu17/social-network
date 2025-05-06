@@ -1,15 +1,25 @@
+:root {
+    background-color: #C8A2C8; /* Jacaranda pentru întreaga pagină */
+}
+
+body {
+    margin: 0;
+    background-color: #C8A2C8; /* Fallback pentru body */
+}
+
 .posts-container {
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
     font-family: Arial, sans-serif;
-    background-color: #C8A2C8; /* Jacaranda mov/roz */
+    background-color: #FFFFFF; /* Fundal alb pentru container */
     border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 h2 {
     text-align: center;
-    color: #873260; /* Boysenberry */
+    color: #873260;
     margin-bottom: 20px;
 }
 
@@ -33,8 +43,8 @@ h2 {
 
 .create-post-button, .filter-button {
     padding: 10px 20px;
-    background-color: #E0B0FF; /* Mauve */
-    color: #873260; /* Boysenberry */
+    background-color: #E0B0FF !important;
+    color: #873260 !important;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -43,12 +53,43 @@ h2 {
 }
 
 .create-post-button:hover, .filter-button:hover {
-    background-color: #D8A0F0; /* Mauve mai închis */
+    background-color: #D8A0F0 !important;
+}
+
+.filter-tags {
+    background-color: #F5F5F5;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.filter-tags h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #873260;
+}
+
+.tag-checkbox {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+    color: #873260;
+}
+
+.tag-checkbox input[type="checkbox"] {
+    margin-right: 8px;
+    accent-color: #873260; /* Culoare boysenberry pentru checkbox */
+    width: 16px;
+    height: 16px;
+}
+
+.tag-checkbox label {
+    cursor: pointer;
 }
 
 form {
     margin-bottom: 20px;
-    background-color: #F5F5F5; /* Fundal gri deschis pentru formular */
+    background-color: #F5F5F5;
     padding: 15px;
     border-radius: 4px;
 }
@@ -76,18 +117,18 @@ textarea:focus, input:focus {
     border-color: #E0B0FF;
 }
 
-button {
+button, .small-button {
     padding: 10px;
-    background-color: #E0B0FF; /* Mauve pentru toate butoanele */
-    color: #873260; /* Boysenberry */
+    background-color: #E0B0FF !important; /* Forțează mauve */
+    color: #873260 !important;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
 
-button:hover {
-    background-color: #D8A0F0; /* Mauve mai închis */
+button:hover, .small-button:hover {
+    background-color: #D8A0F0 !important;
 }
 
 .small-button {
@@ -96,7 +137,7 @@ button:hover {
 }
 
 .post-meta {
-    background-color: #873260; /* Boysenberry */
+    background-color: #873260;
     color: #FFFFFF;
     padding: 5px 10px;
     border-radius: 4px;
@@ -107,7 +148,7 @@ button:hover {
 }
 
 .action-buttons-container {
-    background-color: #F5F5F5; /* Gri deschis */
+    background-color: #F5F5F5;
     padding: 10px;
     border-radius: 4px;
     display: flex;
@@ -129,15 +170,15 @@ button:hover {
 }
 
 .post-content {
-    background-color: #F5F5F5; /* Fundal gri deschis pentru text */
+    background-color: #F5F5F5;
     padding: 10px;
     border-radius: 4px;
-    margin-bottom: 10px; /* Spațiu între text și imagine */
+    margin-bottom: 10px;
 }
 
 .post-image-container {
     display: flex;
-    justify-content: center; /* Centrează imaginea */
+    justify-content: center;
     margin-top: 10px;
 }
 
@@ -151,8 +192,13 @@ button:hover {
     margin-top: 10px;
 }
 
+.existing-tags {
+    margin-bottom: 10px;
+    color: #873260;
+}
+
 .comments-section {
-    background-color: #873260; /* Boysenberry */
+    background-color: #873260;
     color: #FFFFFF;
     padding: 10px;
     border-radius: 4px;
