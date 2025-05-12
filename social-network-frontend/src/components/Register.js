@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 import { useState } from 'react';
 import './Register.css';
@@ -7,8 +6,6 @@ function Register() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [profilePicture, setProfilePicture] = useState('');
-    const [bio, setBio] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
 
@@ -21,16 +18,12 @@ function Register() {
             const response = await axios.post('http://localhost:8080/api/auth/register', {
                 username,
                 email,
-                password,
-                profilePicture,
-                bio
+                password
             });
-            setSuccess(response.data); // "User registered successfully"
+            setSuccess(response.data);
             setUsername('');
             setEmail('');
             setPassword('');
-            setProfilePicture('');
-            setBio('');
         } catch (error) {
             setError(error.response?.data || 'Registration failed');
         }
@@ -67,21 +60,6 @@ function Register() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                    />
-                </div>
-                <div>
-                    <label>Profile Picture URL (optional):</label>
-                    <input
-                        type="text"
-                        value={profilePicture}
-                        onChange={(e) => setProfilePicture(e.target.value)}
-                    />
-                </div>
-                <div>
-                    <label>Bio (optional):</label>
-                    <textarea
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
                     />
                 </div>
                 <button type="submit">Register</button>

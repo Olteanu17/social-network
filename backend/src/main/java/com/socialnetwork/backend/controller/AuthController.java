@@ -36,8 +36,6 @@ public class AuthController {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setProfilePicture(request.getProfilePicture());
-        user.setBio(request.getBio());
         userRepository.save(user);
 
         return ResponseEntity.ok("User registered successfully");
@@ -52,7 +50,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout() {
-
         return ResponseEntity.ok("Logout successful");
     }
 
@@ -78,19 +75,10 @@ class RegisterRequest {
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
-    private String profilePicture;
-
-    @Size(max = 200, message = "Bio must not exceed 200 characters")
-    private String bio;
-
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
-    public String getProfilePicture() { return profilePicture; }
-    public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
-    public String getBio() { return bio; }
-    public void setBio(String bio) { this.bio = bio; }
 }

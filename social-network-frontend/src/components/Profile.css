@@ -2,40 +2,136 @@
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
+    font-family: Arial, sans-serif;
+    background-color: #FFFFFF;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 h2, h4 {
     text-align: center;
+    color: #873260;
+    margin-bottom: 20px;
 }
 
 .error {
     color: red;
     text-align: center;
+    margin-bottom: 10px;
 }
 
 .success {
     color: green;
     text-align: center;
+    margin-bottom: 10px;
+}
+
+.user-selector {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.user-selector select {
+    padding: 8px;
+    border: 1px solid #873260;
+    border-radius: 4px;
+    margin-right: 10px;
+    color: #873260;
+}
+
+.profile-content {
+    border: 1px solid #873260;
+    padding: 15px;
+    border-radius: 4px;
+    background-color: #F5F5F5;
+    margin-bottom: 20px;
+}
+
+.profile-picture-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.profile-picture {
+    max-width: 200px;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid #873260;
+}
+
+.profile-details {
+    background-color: #FFFFFF;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.profile-details p {
+    margin: 8px 0;
+    color: #873260;
+}
+
+.profile-details p strong {
+    color: #873260;
+}
+
+.edit-profile-buttons, .follow-buttons {
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.edit-bio-form, .edit-picture-form {
+    background-color: #F5F5F5;
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+.edit-bio-form div, .edit-picture-form div {
+    margin-bottom: 15px;
+}
+
+.edit-bio-form label, .edit-picture-form label {
+    display: block;
+    margin-bottom: 5px;
+    color: #873260;
+}
+
+.edit-bio-form textarea, .edit-picture-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #873260;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.edit-bio-form textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.edit-picture-form input[type="file"] {
+    padding: 5px;
+}
+
+.edit-bio-form textarea:focus, .edit-picture-form input:focus {
+    outline: none;
+    border-color: #E0B0FF;
 }
 
 button {
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
+    padding: 10px 20px;
+    background-color: #E0B0FF;
+    color: #873260;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    margin: 5px;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #0056b3;
-}
-
-.followers-section {
-    margin-top: 10px;
-}
-
-.followers-list {
-    margin-top: 20px;
+    background-color: #D8A0F0;
 }

@@ -2,12 +2,14 @@
     max-width: 400px;
     margin: 50px auto;
     padding: 20px;
-    border: 1px solid #ccc;
+    border: 1px solid #873260;
     border-radius: 5px;
+    background-color: #FFFFFF;
 }
 
 h2 {
     text-align: center;
+    color: #873260;
 }
 
 .error {
@@ -27,25 +29,26 @@ form div {
 label {
     display: block;
     margin-bottom: 5px;
+    color: #873260;
 }
 
-input, textarea {
+input {
     width: 100%;
     padding: 8px;
-    border: 1px solid #ccc;
+    border: 1px solid #873260;
     border-radius: 4px;
 }
 
 button {
     width: 100%;
     padding: 10px;
-    background-color: #28a745;
-    color: white;
+    background-color: #E0B0FF;
+    color: #873260;
     border: none;
     border-radius: 4px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #218838;
+    background-color: #D8A0F0;
 }

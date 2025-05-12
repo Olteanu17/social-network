@@ -28,9 +28,6 @@ public class User {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    @Column(name = "profile_picture")
-    private String profilePicture;
-
     private String bio;
 
     @Column(name = "created_at", nullable = false, updatable = false)

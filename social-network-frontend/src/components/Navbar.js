@@ -46,7 +46,7 @@ function Navbar() {
             {!isAuthenticated && <Link to="/login">Login</Link>}
             <Link to="/posts">Posts</Link>
             <Link to="/messages">Messages</Link>
-            <Link to="/profile/1">Profile</Link>
+            <Link to="/profile">Profile</Link>
             {isAuthenticated && <button className="logout-button" onClick={handleLogout}>Log Out</button>}
         </nav>
     );

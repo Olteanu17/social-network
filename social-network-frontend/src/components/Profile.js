@@ -1,27 +1,45 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
 import './Profile.css';
 
 function Profile() {
-    const { userId } = useParams();
-    const [user, setUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
+    const [viewedUser, setViewedUser] = useState(null);
     const [followers, setFollowers] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [selectedUserId, setSelectedUserId] = useState('');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [showBioForm, setShowBioForm] = useState(false);
+    const [newBio, setNewBio] = useState('');
 
-    const fetchUser = async () => {
+    const fetchCurrentUser = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/users/me', {
+                withCredentials: true
+            });
+            setCurrentUser(response.data);
+            setViewedUser(response.data);
+            setNewBio(response.data.bio || '');
+            fetchFollowers(response.data.id);
+        } catch (error) {
+            setError('Failed to load current user');
+        }
+    };
+
+    const fetchViewedUser = async (userId) => {
         try {
             const response = await axios.get(`http://localhost:8080/api/users/${userId}`, {
                 withCredentials: true
             });
-            setUser(response.data);
+            setViewedUser(response.data);
+            fetchFollowers(response.data.id);
         } catch (error) {
-            setError('Failed to load user');
+            setError('Failed to load user profile');
         }
     };
 
-    const fetchFollowers = async () => {
+    const fetchFollowers = async (userId) => {
         try {
             const response = await axios.get(`http://localhost:8080/api/followers/user/${userId}`, {
                 withCredentials: true
@@ -32,14 +50,46 @@ function Profile() {
         }
     };
 
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/users/names', {
+                withCredentials: true
+            });
+            setUsers(response.data);
+        } catch (error) {
+            setError('Failed to load users');
+        }
+    };
+
+    const handleUpdateBio = async (e) => {
+        e.preventDefault();
+        setError('');
+        setSuccess('');
+
+        try {
+            const formData = new FormData();
+            formData.append('bio', newBio);
+
+            const response = await axios.put('http://localhost:8080/api/users/me',
+                formData,
+                { withCredentials: true }
+            );
+            setSuccess(response.data);
+            setShowBioForm(false);
+            fetchCurrentUser();
+        } catch (error) {
+            setError(error.response?.data || 'Failed to update bio');
+        }
+    };
+
     const handleFollow = async () => {
         try {
-            const response = await axios.post(`http://localhost:8080/api/followers/user/${userId}`,
+            const response = await axios.post(`http://localhost:8080/api/followers/user/${viewedUser.id}`,
                 {},
                 { withCredentials: true }
             );
             setSuccess(response.data);
-            fetchFollowers();
+            fetchFollowers(viewedUser.id);
         } catch (error) {
             setError(error.response?.data || 'Failed to follow user');
         }
@@ -47,44 +97,86 @@ function Profile() {
 
     const handleUnfollow = async () => {
         try {
-            const response = await axios.delete(`http://localhost:8080/api/followers/user/${userId}`,
+            const response = await axios.delete(`http://localhost:8080/api/followers/user/${viewedUser.id}`,
                 { withCredentials: true }
             );
             setSuccess(response.data);
-            fetchFollowers();
+            fetchFollowers(viewedUser.id);
         } catch (error) {
             setError(error.response?.data || 'Failed to unfollow user');
         }
     };
 
-    useEffect(() => {
-        fetchUser();
-        fetchFollowers();
-    }, [userId]);
+    const handleUserSelect = () => {
+        if (selectedUserId) {
+            fetchViewedUser(selectedUserId);
+        } else {
+            fetchCurrentUser();
+        }
+    };
 
-    if (!user) {
+    useEffect(() => {
+        fetchCurrentUser();
+        fetchUsers();
+    }, []);
+
+    if (!viewedUser) {
         return <div>Loading...</div>;
     }
 
+    const isCurrentUserProfile = currentUser && viewedUser && currentUser.id === viewedUser.id;
+
     return (
         <div className="profile-container">
-            <h2>{user.username}'s Profile</h2>
+            <h2>{viewedUser.username}'s Profile</h2>
             {error && <p className="error">{error}</p>}
             {success && <p className="success">{success}</p>}
-            <p>Email: {user.email}</p>
-            <p>Bio: {user.bio || 'No bio'}</p>
-            <p>Joined: {new Date(user.createdAt).toLocaleString()}</p>
-            <div className="followers-section">
-                <p>Followers: {followers.length}</p>
-                <button onClick={handleFollow}>Follow</button>
-                <button onClick={handleUnfollow}>Unfollow</button>
+            <div className="user-selector">
+                <h4>Select a User</h4>
+                <select
+                    value={selectedUserId}
+                    onChange={(e) => setSelectedUserId(e.target.value)}
+                >
+                    <option value="">My Profile</option>
+                    {users.map(user => (
+                        <option key={user.id} value={user.id}>{user.username}</option>
+                    ))}
+                </select>
+                <button onClick={handleUserSelect}>View Profile</button>
             </div>
-            <div className="followers-list">
-                <h4>Followers</h4>
-                {followers.map(follower => (
-                    <p key={follower.followerId}>{follower.follower.username}</p>
-                ))}
+            <div className="profile-content">
+                <div className="profile-details">
+                    <p><strong>Email:</strong> {viewedUser.email}</p>
+                    <p><strong>Bio:</strong> {viewedUser.bio || 'No bio'}</p>
+                    <p><strong>Joined:</strong> {new Date(viewedUser.createdAt).toLocaleString()}</p>
+                    <p><strong>Followers:</strong> {followers.length}</p>
+                </div>
             </div>
+            {isCurrentUserProfile ? (
+                <div className="edit-profile-buttons">
+                    <button onClick={() => setShowBioForm(!showBioForm)}>
+                        {showBioForm ? 'Cancel' : 'Change Bio'}
+                    </button>
+                </div>
+            ) : (
+                <div className="follow-buttons">
+                    <button onClick={handleFollow}>Follow</button>
+                    <button onClick={handleUnfollow}>Unfollow</button>
+                </div>
+            )}
+            {showBioForm && isCurrentUserProfile && (
+                <form onSubmit={handleUpdateBio} className="edit-bio-form">
+                    <div>
+                        <label>Bio:</label>
+                        <textarea
+                            value={newBio}
+                            onChange={(e) => setNewBio(e.target.value)}
+                            placeholder="Update your bio"
+                        />
+                    </div>
+                    <button type="submit">Save Bio</button>
+                </form>
+            )}
         </div>
     );
 }
