@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/messages")
 public class MessageController {
@@ -52,7 +55,37 @@ public class MessageController {
             return ResponseEntity.status(401).body("User not found");
         }
 
-        return ResponseEntity.ok(messageRepository.findBySenderIdOrReceiverId(currentUser.getId(), userId));
+        List<Message> messages = messageRepository.findAll().stream()
+                .filter(message ->
+                        (message.getSender().getId().equals(currentUser.getId()) && message.getReceiver().getId().equals(userId)) ||
+                                (message.getSender().getId().equals(userId) && message.getReceiver().getId().equals(currentUser.getId()))
+                )
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/users/names")
+    public ResponseEntity<?> getUserNames(Authentication authentication) {
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmail(email);
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        List<User> users = userRepository.findAll().stream()
+                .filter(user -> !user.getId().equals(currentUser.getId()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(users.stream().map(user -> new UserNameDTO(user.getId(), user.getUsername())).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/current-id")
+    public ResponseEntity<?> getCurrentUserId(Authentication authentication) {
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmail(email);
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+        return ResponseEntity.ok(currentUser.getId());
     }
 }
 
@@ -66,4 +99,17 @@ class MessageRequest {
     public void setReceiverId(Long receiverId) { this.receiverId = receiverId; }
     public String getContent() { return content; }
     public void setContent(String content) { this.content = content; }
+}
+
+class UserNameDTO {
+    private Long id;
+    private String username;
+
+    public UserNameDTO(Long id, String username) {
+        this.id = id;
+        this.username = username;
+    }
+
+    public Long getId() { return id; }
+    public String getUsername() { return username; }
 }

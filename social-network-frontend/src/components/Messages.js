@@ -8,8 +8,11 @@ function Messages() {
     const [messages, setMessages] = useState([]);
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const [users, setUsers] = useState([]);
+    const [currentUserId, setCurrentUserId] = useState(null);
 
     const fetchMessages = async () => {
+        if (!receiverId) return;
         try {
             const response = await axios.get(`http://localhost:8080/api/messages/conversation/${receiverId}`, {
                 withCredentials: true
@@ -17,6 +20,28 @@ function Messages() {
             setMessages(response.data);
         } catch (error) {
             setError('Failed to load messages');
+        }
+    };
+
+    const fetchUsers = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/messages/users/names', {
+                withCredentials: true
+            });
+            setUsers(response.data);
+        } catch (error) {
+            setError('Failed to load users');
+        }
+    };
+
+    const fetchCurrentUserId = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/messages/current-id', {
+                withCredentials: true
+            });
+            setCurrentUserId(response.data);
+        } catch (error) {
+            setError('Failed to load current user ID');
         }
     };
 
@@ -38,7 +63,13 @@ function Messages() {
         }
     };
 
+    const handleUserSelect = (userId) => {
+        setReceiverId(userId);
+    };
+
     useEffect(() => {
+        fetchUsers();
+        fetchCurrentUserId();
         if (receiverId) {
             fetchMessages();
         }
@@ -49,33 +80,45 @@ function Messages() {
             <h2>Messages</h2>
             {error && <p className="error">{error}</p>}
             {success && <p className="success">{success}</p>}
-            <div>
-                <label>Receiver ID:</label>
-                <input
-                    type="number"
-                    value={receiverId}
-                    onChange={(e) => setReceiverId(e.target.value)}
-                    placeholder="Enter receiver ID"
-                />
-            </div>
-            <form onSubmit={handleSendMessage}>
-                <div>
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder="Type your message..."
-                        required
-                    />
+            <div className="messages-layout">
+                <div className="users-list">
+                    {users.map(user => (
+                        <div
+                            key={user.id}
+                            className={`user-item ${receiverId === user.id.toString() ? 'selected' : ''}`}
+                            onClick={() => handleUserSelect(user.id.toString())}
+                        >
+                            <p>{user.username}</p>
+                        </div>
+                    ))}
                 </div>
-                <button type="submit">Send</button>
-            </form>
-            <div className="messages-list">
-                {messages.map(message => (
-                    <div key={message.id} className="message">
-                        <p><strong>{message.sender.username}</strong> to <strong>{message.receiver.username}</strong>: {message.content}</p>
-                        <p>{new Date(message.sentAt).toLocaleString()} {message.isRead ? '(Read)' : '(Unread)'}</p>
+                {receiverId && (
+                    <div className="conversation-container">
+                        <div className="messages-list">
+                            {messages.map(message => {
+                                const isSentByCurrentUser = message.sender.id.toString() === currentUserId.toString();
+                                const senderName = isSentByCurrentUser ? 'You' : message.sender.username;
+                                return (
+                                    <div key={message.id} className={`message ${isSentByCurrentUser ? 'sent' : 'received'}`}>
+                                        <p><strong>{senderName}:</strong> {message.content}</p>
+                                        <p>{new Date(message.sentAt).toLocaleString()}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                        <form onSubmit={handleSendMessage}>
+                            <div className="message-input">
+                                <textarea
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                    placeholder="Type your message..."
+                                    required
+                                />
+                                <button type="submit">Send</button>
+                            </div>
+                        </form>
                     </div>
-                ))}
+                )}
             </div>
         </div>
     );
