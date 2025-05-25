@@ -8,6 +8,8 @@ import com.socialnetwork.backend.repository.PostRepository;
 import com.socialnetwork.backend.repository.UserRepository;
 import com.socialnetwork.backend.repository.TagRepository;
 import com.socialnetwork.backend.repository.PostTagRepository;
+import com.socialnetwork.backend.repository.UserPostLikeRepository;
+import com.socialnetwork.backend.repository.CommentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -36,6 +38,12 @@ public class PostController {
 
     @Autowired
     private PostTagRepository postTagRepository;
+
+    @Autowired
+    private UserPostLikeRepository userPostLikeRepository;
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     @PostMapping
     public ResponseEntity<?> createPost(
@@ -143,6 +151,11 @@ public class PostController {
         if (!post.getUser().getId().equals(user.getId())) {
             return ResponseEntity.status(403).body("Only the creator can delete this post");
         }
+
+        // Șterge relațiile asociate
+        postTagRepository.deleteByPostId(postId);
+        userPostLikeRepository.deleteByPostId(postId);
+        commentRepository.deleteByPostId(postId);
 
         postRepository.delete(post);
         return ResponseEntity.ok("Post deleted successfully");

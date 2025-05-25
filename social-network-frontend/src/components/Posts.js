@@ -37,7 +37,7 @@ function Posts() {
                 ]);
             }
         } catch (error) {
-            setError(error.response?.data || 'Failed to load posts');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to load posts');
         }
     };
 
@@ -114,8 +114,7 @@ function Posts() {
             setShowCreatePostForm(false);
             fetchPosts();
         } catch (error) {
-            console.error('Upload error:', error.response?.data, error.message);
-            setError(error.response?.data || 'Failed to create post');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to create post');
         }
     };
 
@@ -146,7 +145,7 @@ function Posts() {
             setSuccess(response.data);
             fetchLikes(postId);
         } catch (error) {
-            setError(error.response?.data || 'Failed to like post');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to like post');
         }
     };
 
@@ -158,7 +157,7 @@ function Posts() {
             setSuccess(response.data);
             fetchLikes(postId);
         } catch (error) {
-            setError(error.response?.data || 'Failed to unlike post');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to unlike post');
         }
     };
 
@@ -177,7 +176,7 @@ function Posts() {
             fetchTags(postId);
             fetchAllTags();
         } catch (error) {
-            setError(error.response?.data || 'Failed to add tag');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to add tag');
         }
     };
 
@@ -186,10 +185,10 @@ function Posts() {
             const response = await axios.delete(`http://localhost:8080/api/posts/${postId}`, {
                 withCredentials: true
             });
-            setSuccess(response.data);
+            setSuccess(typeof response.data === 'string' ? response.data : response.data?.message || 'Post deleted successfully');
             setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
         } catch (error) {
-            setError(error.response?.data || 'Failed to delete post');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to delete post');
         }
     };
 
@@ -206,7 +205,7 @@ function Posts() {
             setEditContent('');
             fetchPosts();
         } catch (error) {
-            setError(error.response?.data || 'Failed to edit post');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to edit post');
         }
     };
 
