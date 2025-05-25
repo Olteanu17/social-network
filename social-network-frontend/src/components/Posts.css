@@ -213,3 +213,15 @@ button:hover, .small-button:hover {
 .comment:first-child {
     border-top: none;
 }
+
+.edit-post-form {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F5F5F5;
+    border-radius: 4px;
+}
+
+.edit-post-form textarea {
+    height: 80px;
+    margin-bottom: 10px;
+}

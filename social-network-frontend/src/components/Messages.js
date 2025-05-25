@@ -10,6 +10,8 @@ function Messages() {
     const [success, setSuccess] = useState('');
     const [users, setUsers] = useState([]);
     const [currentUserId, setCurrentUserId] = useState(null);
+    const [editMessageId, setEditMessageId] = useState(null);
+    const [editContent, setEditContent] = useState('');
 
     const fetchMessages = async () => {
         if (!receiverId) return;
@@ -19,7 +21,7 @@ function Messages() {
             });
             setMessages(response.data);
         } catch (error) {
-            setError('Failed to load messages');
+            setError(error.response?.data || 'Failed to load messages');
         }
     };
 
@@ -30,7 +32,7 @@ function Messages() {
             });
             setUsers(response.data);
         } catch (error) {
-            setError('Failed to load users');
+            setError(error.response?.data || 'Failed to load users');
         }
     };
 
@@ -41,7 +43,7 @@ function Messages() {
             });
             setCurrentUserId(response.data);
         } catch (error) {
-            setError('Failed to load current user ID');
+            setError(error.response?.data || 'Failed to load current user ID');
         }
     };
 
@@ -59,7 +61,36 @@ function Messages() {
             setContent('');
             fetchMessages();
         } catch (error) {
-            setError(error.response?.data || 'Failed to send message');
+            setError(typeof error.response?.data === 'string' ? error.response.data : 'Failed to send message');
+        }
+    };
+
+    const handleEditMessage = async (messageId) => {
+        try {
+            const formData = new FormData();
+            formData.append('content', editContent);
+            const response = await axios.put(`http://localhost:8080/api/messages/${messageId}`,
+                formData,
+                { withCredentials: true }
+            );
+            setSuccess(response.data);
+            setEditMessageId(null);
+            setEditContent('');
+            fetchMessages();
+        } catch (error) {
+            setError(typeof error.response?.data === 'string' ? error.response.data : 'Failed to edit message');
+        }
+    };
+
+    const handleDeleteMessage = async (messageId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/api/messages/${messageId}`, {
+                withCredentials: true
+            });
+            setSuccess(response.data);
+            fetchMessages();
+        } catch (error) {
+            setError(typeof error.response?.data === 'string' ? error.response.data : 'Failed to delete message');
         }
     };
 
@@ -96,12 +127,35 @@ function Messages() {
                     <div className="conversation-container">
                         <div className="messages-list">
                             {messages.map(message => {
-                                const isSentByCurrentUser = message.sender.id.toString() === currentUserId.toString();
+                                const isSentByCurrentUser = message.sender.id.toString() === currentUserId?.toString();
                                 const senderName = isSentByCurrentUser ? 'You' : message.sender.username;
                                 return (
                                     <div key={message.id} className={`message ${isSentByCurrentUser ? 'sent' : 'received'}`}>
-                                        <p><strong>{senderName}:</strong> {message.content}</p>
-                                        <p>{new Date(message.sentAt).toLocaleString()}</p>
+                                        {editMessageId === message.id ? (
+                                            <form onSubmit={(e) => { e.preventDefault(); handleEditMessage(message.id); }}>
+                                                <textarea
+                                                    value={editContent}
+                                                    onChange={(e) => setEditContent(e.target.value)}
+                                                    required
+                                                />
+                                                <button type="submit">Save</button>
+                                                <button type="button" onClick={() => setEditMessageId(null)}>Cancel</button>
+                                            </form>
+                                        ) : (
+                                            <>
+                                                <p><strong>{senderName}:</strong> {message.content}</p>
+                                                <p>{new Date(message.sentAt).toLocaleString()}</p>
+                                                {isSentByCurrentUser && (
+                                                    <div className="message-actions">
+                                                        <button onClick={() => {
+                                                            setEditMessageId(message.id);
+                                                            setEditContent(message.content);
+                                                        }}>Edit</button>
+                                                        <button onClick={() => handleDeleteMessage(message.id)}>Delete</button>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
                                 );
                             })}

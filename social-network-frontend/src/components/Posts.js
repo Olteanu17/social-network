@@ -16,6 +16,9 @@ function Posts() {
     const [showFilterTags, setShowFilterTags] = useState(false);
     const [allTags, setAllTags] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
+    const [editPostId, setEditPostId] = useState(null);
+    const [editContent, setEditContent] = useState('');
+    const [currentUserEmail, setCurrentUserEmail] = useState('');
 
     const fetchPosts = async () => {
         try {
@@ -109,7 +112,7 @@ function Posts() {
             setImageFile(null);
             document.getElementById('imageInput').value = '';
             setShowCreatePostForm(false);
-            setPosts(prevPosts => [response.data, ...prevPosts]);
+            fetchPosts();
         } catch (error) {
             console.error('Upload error:', error.response?.data, error.message);
             setError(error.response?.data || 'Failed to create post');
@@ -172,9 +175,38 @@ function Posts() {
             setSuccess(response.data);
             setTagContent(prev => ({ ...prev, [postId]: '' }));
             fetchTags(postId);
-            fetchAllTags(); // Actualizează lista de tag-uri
+            fetchAllTags();
         } catch (error) {
             setError(error.response?.data || 'Failed to add tag');
+        }
+    };
+
+    const handleDeletePost = async (postId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/api/posts/${postId}`, {
+                withCredentials: true
+            });
+            setSuccess(response.data);
+            setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+        } catch (error) {
+            setError(error.response?.data || 'Failed to delete post');
+        }
+    };
+
+    const handleEditPost = async (postId) => {
+        try {
+            const formData = new FormData();
+            formData.append('content', editContent);
+            const response = await axios.put(`http://localhost:8080/api/posts/${postId}`,
+                formData,
+                { withCredentials: true }
+            );
+            setSuccess('Post updated successfully');
+            setEditPostId(null);
+            setEditContent('');
+            fetchPosts();
+        } catch (error) {
+            setError(error.response?.data || 'Failed to edit post');
         }
     };
 
@@ -194,7 +226,20 @@ function Posts() {
         );
     };
 
+    const isCurrentUserPost = (post) => {
+        return post.user.email === currentUserEmail;
+    };
+
     useEffect(() => {
+        const fetchCurrentUserEmail = async () => {
+            try {
+                const response = await axios.get('http://localhost:8080/api/users/me', { withCredentials: true });
+                setCurrentUserEmail(response.data.email);
+            } catch (error) {
+                setError('Failed to load current user');
+            }
+        };
+        fetchCurrentUserEmail();
         fetchPosts();
         fetchAllTags();
     }, [selectedTags]);
@@ -276,7 +321,27 @@ function Posts() {
                             <button className="small-button" onClick={() => handleUnlikePost(post.id)}>Dislike</button>
                             <button className="small-button" onClick={() => toggleTagForm(post.id)}>Add Tag</button>
                             <button className="small-button" onClick={() => toggleCommentForm(post.id)}>Add Comment</button>
+                            {isCurrentUserPost(post) && (
+                                <>
+                                    <button className="small-button" onClick={() => {
+                                        setEditPostId(post.id);
+                                        setEditContent(post.content);
+                                    }}>Edit</button>
+                                    <button className="small-button" onClick={() => handleDeletePost(post.id)}>Delete</button>
+                                </>
+                            )}
                         </div>
+                        {editPostId === post.id && (
+                            <form onSubmit={(e) => handleEditPost(post.id)} className="edit-post-form">
+                                <textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    required
+                                />
+                                <button type="submit" className="small-button">Save</button>
+                                <button type="button" className="small-button" onClick={() => setEditPostId(null)}>Cancel</button>
+                            </form>
+                        )}
                         {showTagForm[post.id] && (
                             <div className="tags-section">
                                 {post.tags && post.tags.length > 0 && (

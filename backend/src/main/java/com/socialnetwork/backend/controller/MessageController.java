@@ -87,6 +87,52 @@ public class MessageController {
         }
         return ResponseEntity.ok(currentUser.getId());
     }
+
+    @PutMapping("/{messageId}")
+    public ResponseEntity<?> editMessage(
+            @PathVariable Long messageId,
+            @RequestPart("content") @NotBlank String content,
+            Authentication authentication) {
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmail(email);
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        Message message = messageRepository.findById(messageId).orElse(null);
+        if (message == null) {
+            return ResponseEntity.status(404).body("Message not found");
+        }
+
+        if (!message.getSender().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(403).body("Only the sender can edit this message");
+        }
+
+        message.setContent(content);
+        messageRepository.save(message);
+        return ResponseEntity.ok("Message updated successfully");
+    }
+
+    @DeleteMapping("/{messageId}")
+    public ResponseEntity<?> deleteMessage(@PathVariable Long messageId, Authentication authentication) {
+        String email = authentication.getName();
+        User currentUser = userRepository.findByEmail(email);
+        if (currentUser == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        Message message = messageRepository.findById(messageId).orElse(null);
+        if (message == null) {
+            return ResponseEntity.status(404).body("Message not found");
+        }
+
+        if (!message.getSender().getId().equals(currentUser.getId())) {
+            return ResponseEntity.status(403).body("Only the sender can delete this message");
+        }
+
+        messageRepository.delete(message);
+        return ResponseEntity.ok("Message deleted successfully");
+    }
 }
 
 class MessageRequest {

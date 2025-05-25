@@ -83,6 +83,7 @@ h2 {
     margin-bottom: 10px;
     border-radius: 4px;
     max-width: 70%;
+    position: relative;
 }
 
 .received {
@@ -142,4 +143,34 @@ button {
 
 button:hover {
     background-color: #D8A0F0; /* Mauve mai închis */
+}
+
+.message-actions {
+    margin-top: 5px;
+    display: flex;
+    gap: 5px;
+}
+
+.message-actions button {
+    padding: 5px 10px;
+    font-size: 12px;
+    width: auto;
+}
+
+.edit-message-form {
+    margin-top: 5px;
+}
+
+.edit-message-form textarea {
+    width: 100%;
+    padding: 5px;
+    border: 1px solid #873260;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+
+.edit-message-form button {
+    padding: 5px 10px;
+    font-size: 12px;
+    width: auto;
 }

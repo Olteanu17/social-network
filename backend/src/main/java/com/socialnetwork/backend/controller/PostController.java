@@ -87,10 +87,9 @@ public class PostController {
     @GetMapping("/filter")
     public ResponseEntity<?> filterPostsByTags(@RequestParam(required = false) List<String> tags) {
         if (tags == null || tags.isEmpty()) {
-            return getPosts(); // Returnează toate postările dacă nu sunt tag-uri
+            return getPosts();
         }
 
-        // Găsește ID-urile tag-urilor
         List<Tag> tagEntities = tagRepository.findAll().stream()
                 .filter(tag -> tags.contains(tag.getName()))
                 .collect(Collectors.toList());
@@ -99,7 +98,6 @@ public class PostController {
             return ResponseEntity.badRequest().body("One or more tags not found");
         }
 
-        // Găsește postările care au toate tag-urile specificate
         List<PostTag> postTags = postTagRepository.findAll();
         Set<Long> postIds = null;
         for (Tag tag : tagEntities) {
@@ -110,22 +108,14 @@ public class PostController {
             if (postIds == null) {
                 postIds = currentPostIds;
             } else {
-                postIds.retainAll(currentPostIds); // Intersecție
+                postIds.retainAll(currentPostIds);
             }
             if (postIds.isEmpty()) {
-                break; // Nu există postări cu toate tag-urile
+                break;
             }
         }
 
-        // Obține postările
-        List<Post> filteredPosts;
-        if (postIds == null || postIds.isEmpty()) {
-            filteredPosts = List.of(); // Listă goală dacă nu există postări
-        } else {
-            filteredPosts = postRepository.findAllById(postIds);
-        }
-
-        // Convertește imaginile în Base64
+        List<Post> filteredPosts = postIds != null && !postIds.isEmpty() ? postRepository.findAllById(postIds) : List.of();
         List<Post> postsWithBase64 = filteredPosts.stream().map(post -> {
             if (post.getImageData() != null) {
                 String base64Image = Base64.getEncoder().encodeToString(post.getImageData());
@@ -135,5 +125,55 @@ public class PostController {
         }).collect(Collectors.toList());
 
         return ResponseEntity.ok(postsWithBase64);
+    }
+
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null) {
+            return ResponseEntity.status(404).body("Post not found");
+        }
+
+        if (!post.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body("Only the creator can delete this post");
+        }
+
+        postRepository.delete(post);
+        return ResponseEntity.ok("Post deleted successfully");
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> editPost(
+            @PathVariable Long postId,
+            @RequestPart("content") @NotBlank String content,
+            Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null) {
+            return ResponseEntity.status(404).body("Post not found");
+        }
+
+        if (!post.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body("Only the creator can edit this post");
+        }
+
+        post.setContent(content);
+        Post updatedPost = postRepository.save(post);
+        if (updatedPost.getImageData() != null) {
+            String base64Image = Base64.getEncoder().encodeToString(updatedPost.getImageData());
+            updatedPost.setImageUrl("data:" + updatedPost.getImageUrl() + ";base64," + base64Image);
+        }
+        return ResponseEntity.ok(updatedPost);
     }
 }
