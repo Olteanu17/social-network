@@ -10,7 +10,7 @@
 }
 
 h2 {
-    color: #873260; /* Boysenberry */
+    color: #873260;
     margin-bottom: 20px;
 }
 
@@ -19,7 +19,7 @@ h2 {
     margin-bottom: 10px;
 }
 
-/* Quick Navigation */
+
 .quick-nav {
     display: flex;
     justify-content: center;
@@ -40,7 +40,7 @@ h2 {
     background-color: #D8A0F0;
 }
 
-/* Recent Notifications */
+
 .recent-notifications {
     margin-bottom: 30px;
 }
@@ -102,7 +102,7 @@ h2 {
     text-align: right;
 }
 
-/* Logout Button */
+
 .logout-button {
     padding: 10px 20px;
     background-color: #dc3545;

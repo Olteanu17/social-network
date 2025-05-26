@@ -9,7 +9,7 @@ function Home() {
     const [recentMessages, setRecentMessages] = useState([]);
     const [error, setError] = useState('');
 
-    // Fetch current user
+
     const fetchCurrentUser = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/users/me', { withCredentials: true });
@@ -19,7 +19,7 @@ function Home() {
         }
     };
 
-    // Fetch recent posts
+
     const fetchRecentPosts = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/posts', { withCredentials: true });
@@ -30,7 +30,7 @@ function Home() {
         }
     };
 
-    // Fetch recent messages received by current user
+
     const fetchRecentMessages = async () => {
         try {
             const usersResponse = await axios.get('http://localhost:8080/api/messages/users/names', { withCredentials: true });
@@ -72,14 +72,12 @@ function Home() {
             <h2>{currentUser ? `Welcome, ${currentUser.username}!` : 'Welcome to Home!'}</h2>
             {error && <p className="error">{error}</p>}
 
-            {/* Quick Navigation */}
             <div className="quick-nav">
                 <Link to="/posts" className="nav-button">View Posts</Link>
                 <Link to="/messages" className="nav-button">Messages</Link>
                 <Link to="/profile" className="nav-button">Profile</Link>
             </div>
 
-            {/* Recent Notifications */}
             <div className="recent-notifications">
                 <h3>Recent Notifications</h3>
                 <div className="notifications-list">
@@ -125,7 +123,7 @@ function Home() {
                 </div>
             </div>
 
-            {/* Logout Button */}
+
             <button onClick={handleLogout} className="logout-button">Logout</button>
         </div>
     );

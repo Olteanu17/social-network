@@ -152,7 +152,6 @@ public class PostController {
             return ResponseEntity.status(403).body("Only the creator can delete this post");
         }
 
-        // Șterge relațiile asociate
         postTagRepository.deleteByPostId(postId);
         userPostLikeRepository.deleteByPostId(postId);
         commentRepository.deleteByPostId(postId);

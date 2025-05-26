@@ -1,36 +1,36 @@
 body {
-  background-color: #FFFFFF; /* Fundal alb */
+  background-color: #FFFFFF;
   margin: 0;
   font-family: Arial, sans-serif;
 }
 
 .App {
   text-align: center;
-  color: #873260; /* Boysenberry pentru textul principal */
+  color: #873260;
 }
 
 .App-header {
-  background-color: #873260; /* Boysenberry */
+  background-color: #873260;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: #FFFFFF; /* Alb pentru text */
+  color: #FFFFFF;
 }
 
 .App-link {
-  color: #E0B0FF; /* Mauve pentru link-uri */
+  color: #E0B0FF;
 }
 
 h2, h3, h4 {
-  color: #873260; /* Boysenberry pentru titluri */
+  color: #873260;
 }
 
 button:not(.logout-button) {
-  background-color: #873260; /* Boysenberry pentru alte butoane */
-  color: #FFFFFF; /* Alb pentru text */
+  background-color: #873260;
+  color: #FFFFFF;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
@@ -39,11 +39,11 @@ button:not(.logout-button) {
 }
 
 button:not(.logout-button):hover {
-  background-color: #6B2749; /* Boysenberry mai închis pentru hover */
+  background-color: #6B2749;
 }
 
 textarea, input {
-  border: 1px solid #873260; /* Bordură boysenberry */
+  border: 1px solid #873260;
   border-radius: 5px;
   padding: 8px;
   font-size: 16px;
@@ -51,5 +51,5 @@ textarea, input {
 
 textarea:focus, input:focus {
   outline: none;
-  border-color: #E0B0FF; /* Mauve pentru focus */
+  border-color: #E0B0FF;
 }

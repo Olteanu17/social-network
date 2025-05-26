@@ -1,10 +1,10 @@
 :root {
-    background-color: #C8A2C8; /* Jacaranda pentru întreaga pagină */
+    background-color: #C8A2C8;
 }
 
 body {
     margin: 0;
-    background-color: #C8A2C8; /* Fallback pentru body */
+    background-color: #C8A2C8;
 }
 
 .posts-container {
@@ -12,7 +12,7 @@ body {
     margin: 50px auto;
     padding: 20px;
     font-family: Arial, sans-serif;
-    background-color: #FFFFFF; /* Fundal alb pentru container */
+    background-color: #FFFFFF;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -78,7 +78,7 @@ h2 {
 
 .tag-checkbox input[type="checkbox"] {
     margin-right: 8px;
-    accent-color: #873260; /* Culoare boysenberry pentru checkbox */
+    accent-color: #873260;
     width: 16px;
     height: 16px;
 }
@@ -119,7 +119,7 @@ textarea:focus, input:focus {
 
 button, .small-button {
     padding: 10px;
-    background-color: #E0B0FF !important; /* Forțează mauve */
+    background-color: #E0B0FF !important;
     color: #873260 !important;
     border: none;
     border-radius: 4px;
