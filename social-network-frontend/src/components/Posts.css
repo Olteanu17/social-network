@@ -225,3 +225,23 @@ button:hover, .small-button:hover {
     height: 80px;
     margin-bottom: 10px;
 }
+.edit-comment-form, .edit-tag-form {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #F5F5F5;
+    border-radius: 4px;
+}
+
+.edit-comment-form textarea, .edit-tag-form input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #873260;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.edit-comment-form textarea:focus, .edit-tag-form input:focus {
+    outline: none;
+    border-color: #E0B0FF;
+}

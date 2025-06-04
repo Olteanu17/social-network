@@ -54,6 +54,49 @@ public class CommentController {
                 .filter(comment -> comment.getPost().getId().equals(postId))
                 .toList());
     }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<?> deleteComment(@PathVariable Long commentId, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        Comment comment = commentRepository.findById(commentId).orElse(null);
+        if (comment == null) {
+            return ResponseEntity.status(404).body("Comment not found");
+        }
+
+        if (!comment.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body("Only the creator can delete this comment");
+        }
+
+        commentRepository.delete(comment);
+        return ResponseEntity.ok("Comment deleted successfully");
+    }
+
+    @PutMapping("/{commentId}")
+    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @Valid @RequestBody CommentRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            return ResponseEntity.status(401).body("User not found");
+        }
+
+        Comment comment = commentRepository.findById(commentId).orElse(null);
+        if (comment == null) {
+            return ResponseEntity.status(404).body("Comment not found");
+        }
+
+        if (!comment.getUser().getId().equals(user.getId())) {
+            return ResponseEntity.status(403).body("Only the creator can edit this comment");
+        }
+
+        comment.setContent(request.getContent());
+        commentRepository.save(comment);
+        return ResponseEntity.ok("Comment updated successfully");
+    }
 }
 
 class CommentRequest {

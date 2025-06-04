@@ -18,6 +18,10 @@ function Posts() {
     const [selectedTags, setSelectedTags] = useState([]);
     const [editPostId, setEditPostId] = useState(null);
     const [editContent, setEditContent] = useState('');
+    const [editCommentId, setEditCommentId] = useState(null);
+    const [editCommentContent, setEditCommentContent] = useState('');
+    const [editTagId, setEditTagId] = useState(null);
+    const [editTagName, setEditTagName] = useState('');
     const [currentUserEmail, setCurrentUserEmail] = useState('');
 
     const fetchPosts = async () => {
@@ -50,7 +54,7 @@ function Posts() {
                 post.id === postId ? { ...post, comments: response.data } : post
             ));
         } catch (error) {
-            setError('Comments functionality is not implemented yet');
+            setError('Failed to load comments');
         }
     };
 
@@ -128,11 +132,65 @@ function Posts() {
                 { postId, content: commentContent[postId] || '' },
                 { withCredentials: true }
             );
-            setSuccess(response.data);
+            setSuccess('Comment created successfully');
             setCommentContent(prev => ({ ...prev, [postId]: '' }));
             fetchComments(postId);
         } catch (error) {
-            setError('Comments functionality is not implemented yet');
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to create comment');
+        }
+    };
+
+    const handleDeleteComment = async (postId, commentId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/api/comments/${commentId}`, {
+                withCredentials: true
+            });
+            setSuccess(typeof response.data === 'string' ? response.data : response.data?.message || 'Comment deleted successfully');
+            fetchComments(postId);
+        } catch (error) {
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to delete comment');
+        }
+    };
+
+    const handleEditComment = async (postId, commentId) => {
+        try {
+            const response = await axios.put(`http://localhost:8080/api/comments/${commentId}`,
+                { content: editCommentContent },
+                { withCredentials: true }
+            );
+            setSuccess('Comment updated successfully');
+            setEditCommentId(null);
+            setEditCommentContent('');
+            fetchComments(postId);
+        } catch (error) {
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to edit comment');
+        }
+    };
+
+    const handleDeleteTag = async (postId, tagId) => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/api/tags/post/${postId}/tag/${tagId}`, {
+                withCredentials: true
+            });
+            setSuccess(typeof response.data === 'string' ? response.data : response.data?.message || 'Tag removed successfully');
+            fetchTags(postId);
+        } catch (error) {
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to remove tag');
+        }
+    };
+
+    const handleEditTag = async (postId, tagId) => {
+        try {
+            const response = await axios.put(`http://localhost:8080/api/tags/post/${postId}/tag/${tagId}`,
+                { name: editTagName },
+                { withCredentials: true }
+            );
+            setSuccess('Tag updated successfully');
+            setEditTagId(null);
+            setEditTagName('');
+            fetchTags(postId);
+        } catch (error) {
+            setError(typeof error.response?.data === 'string' ? error.response.data : error.response?.data?.message || 'Failed to edit tag');
         }
     };
 
@@ -227,6 +285,14 @@ function Posts() {
 
     const isCurrentUserPost = (post) => {
         return post.user.email === currentUserEmail;
+    };
+
+    const isCurrentUserComment = (comment) => {
+        return comment.user.email === currentUserEmail;
+    };
+
+    const isCurrentUserTag = (post, tag) => {
+        return isCurrentUserPost(post); // Tag-urile sunt legate de postare
     };
 
     useEffect(() => {
@@ -346,6 +412,31 @@ function Posts() {
                                 {post.tags && post.tags.length > 0 && (
                                     <div className="existing-tags">
                                         <p>Existing Tags: {post.tags.map(tag => tag.name).join(', ')}</p>
+                                        {post.tags.map(tag => (
+                                            <div key={tag.id} className="tag-action">
+                                                {isCurrentUserTag(post, tag) && (
+                                                    <>
+                                                        <button className="small-button" onClick={() => {
+                                                            setEditTagId(tag.id);
+                                                            setEditTagName(tag.name);
+                                                        }}>Edit</button>
+                                                        <button className="small-button" onClick={() => handleDeleteTag(post.id, tag.id)}>Delete</button>
+                                                    </>
+                                                )}
+                                                {editTagId === tag.id && (
+                                                    <form onSubmit={(e) => handleEditTag(post.id, tag.id)} className="edit-tag-form">
+                                                        <input
+                                                            type="text"
+                                                            value={editTagName}
+                                                            onChange={(e) => setEditTagName(e.target.value)}
+                                                            required
+                                                        />
+                                                        <button type="submit" className="small-button">Save</button>
+                                                        <button type="button" className="small-button" onClick={() => setEditTagId(null)}>Cancel</button>
+                                                    </form>
+                                                )}
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                                 <form onSubmit={(e) => handleAddTag(e, post.id)}>
@@ -367,6 +458,26 @@ function Posts() {
                                         <div key={comment.id} className="comment">
                                             <p><strong>{comment.user.username}</strong>: {comment.content}</p>
                                             <p>{new Date(comment.createdAt).toLocaleString()}</p>
+                                            {isCurrentUserComment(comment) && (
+                                                <>
+                                                    <button className="small-button" onClick={() => {
+                                                        setEditCommentId(comment.id);
+                                                        setEditCommentContent(comment.content);
+                                                    }}>Edit</button>
+                                                    <button className="small-button" onClick={() => handleDeleteComment(post.id, comment.id)}>Delete</button>
+                                                </>
+                                            )}
+                                            {editCommentId === comment.id && (
+                                                <form onSubmit={(e) => handleEditComment(post.id, comment.id)} className="edit-comment-form">
+                                                    <textarea
+                                                        value={editCommentContent}
+                                                        onChange={(e) => setEditCommentContent(e.target.value)}
+                                                        required
+                                                    />
+                                                    <button type="submit" className="small-button">Save</button>
+                                                    <button type="button" className="small-button" onClick={() => setEditCommentId(null)}>Cancel</button>
+                                                </form>
+                                            )}
                                         </div>
                                     ))
                                 ) : null}

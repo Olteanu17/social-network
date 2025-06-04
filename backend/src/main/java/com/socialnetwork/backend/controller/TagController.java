@@ -9,6 +9,7 @@ import com.socialnetwork.backend.repository.PostTagRepository;
 import com.socialnetwork.backend.repository.PostRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -29,7 +30,13 @@ public class TagController {
     private PostRepository postRepository;
 
     @PostMapping
-    public ResponseEntity<?> createTag(@Valid @RequestBody TagRequest request) {
+    public ResponseEntity<?> createTag(@Valid @RequestBody TagRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        // Verifică dacă utilizatorul este autentificat
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(email)) {
+            return ResponseEntity.status(401).body("Authentication required");
+        }
+
         Tag existingTag = tagRepository.findByName(request.getName());
         if (existingTag != null) {
             return ResponseEntity.badRequest().body("Tag already exists");
@@ -43,10 +50,21 @@ public class TagController {
     }
 
     @PostMapping("/post/{postId}")
-    public ResponseEntity<?> addTagToPost(@PathVariable Long postId, @Valid @RequestBody TagRequest request) {
+    public ResponseEntity<?> addTagToPost(@PathVariable Long postId, @Valid @RequestBody TagRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        // Verifică dacă utilizatorul este autentificat
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(email)) {
+            return ResponseEntity.status(401).body("Authentication required");
+        }
+
         Post post = postRepository.findById(postId).orElse(null);
         if (post == null) {
             return ResponseEntity.badRequest().body("Post not found");
+        }
+
+        // Verifică dacă utilizatorul este creatorul postării
+        if (!post.getUser().getEmail().equals(email)) {
+            return ResponseEntity.status(403).body("Only the post creator can add tags");
         }
 
         Tag tag = tagRepository.findByName(request.getName());
@@ -75,7 +93,23 @@ public class TagController {
     }
 
     @DeleteMapping("/post/{postId}/tag/{tagId}")
-    public ResponseEntity<?> removeTagFromPost(@PathVariable Long postId, @PathVariable Long tagId) {
+    public ResponseEntity<?> removeTagFromPost(@PathVariable Long postId, @PathVariable Long tagId, Authentication authentication) {
+        String email = authentication.getName();
+        // Verifică dacă utilizatorul este autentificat
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(email)) {
+            return ResponseEntity.status(401).body("Authentication required");
+        }
+
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null) {
+            return ResponseEntity.status(404).body("Post not found");
+        }
+
+        // Verifică dacă utilizatorul este creatorul postării
+        if (!post.getUser().getEmail().equals(email)) {
+            return ResponseEntity.status(403).body("Only the post creator can remove tags");
+        }
+
         PostTagId postTagId = new PostTagId();
         postTagId.setPostId(postId);
         postTagId.setTagId(tagId);
@@ -86,6 +120,43 @@ public class TagController {
 
         postTagRepository.deleteById(postTagId);
         return ResponseEntity.ok("Tag removed from post successfully");
+    }
+
+    @PutMapping("/post/{postId}/tag/{tagId}")
+    public ResponseEntity<?> updateTagInPost(@PathVariable Long postId, @PathVariable Long tagId, @Valid @RequestBody TagRequest request, Authentication authentication) {
+        String email = authentication.getName();
+        // Verifică dacă utilizatorul este autentificat
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(email)) {
+            return ResponseEntity.status(401).body("Authentication required");
+        }
+
+        Post post = postRepository.findById(postId).orElse(null);
+        if (post == null) {
+            return ResponseEntity.status(404).body("Post not found");
+        }
+
+        // Verifică dacă utilizatorul este creatorul postării
+        if (!post.getUser().getEmail().equals(email)) {
+            return ResponseEntity.status(403).body("Only the post creator can edit tags");
+        }
+
+        PostTagId postTagId = new PostTagId();
+        postTagId.setPostId(postId);
+        postTagId.setTagId(tagId);
+
+        if (!postTagRepository.existsById(postTagId)) {
+            return ResponseEntity.badRequest().body("Tag not associated with post");
+        }
+
+        Tag tag = tagRepository.findById(tagId).orElse(null);
+        if (tag == null) {
+            return ResponseEntity.status(404).body("Tag not found");
+        }
+
+        tag.setName(request.getName());
+        tagRepository.save(tag);
+
+        return ResponseEntity.ok("Tag updated successfully");
     }
 
     @GetMapping("/post/{postId}")

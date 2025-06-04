@@ -82,6 +82,31 @@ function Profile() {
         }
     };
 
+    const handleMakeAdmin = async () => {
+        try {
+            const response = await axios.put(`http://localhost:8080/api/users/${viewedUser.id}/make-admin`, {}, {
+                withCredentials: true
+            });
+            setSuccess(response.data);
+            fetchViewedUser(viewedUser.id);
+        } catch (error) {
+            setError(error.response?.data || 'Failed to make user admin');
+        }
+    };
+
+    const handleDeleteUser = async () => {
+        try {
+            const response = await axios.delete(`http://localhost:8080/api/users/${viewedUser.id}`, {
+                withCredentials: true
+            });
+            setSuccess(response.data);
+            setViewedUser(null);
+            fetchCurrentUser();
+        } catch (error) {
+            setError(error.response?.data || 'Failed to delete user');
+        }
+    };
+
     const handleFollow = async () => {
         try {
             const response = await axios.post(`http://localhost:8080/api/followers/user/${viewedUser.id}`,
@@ -125,6 +150,8 @@ function Profile() {
     }
 
     const isCurrentUserProfile = currentUser && viewedUser && currentUser.id === viewedUser.id;
+    const isAdmin = currentUser?.admin || false;
+    const isNotSelfProfile = !isCurrentUserProfile;
 
     return (
         <div className="profile-container">
@@ -139,7 +166,7 @@ function Profile() {
                 >
                     <option value="">My Profile</option>
                     {users.map(user => (
-                        <option key={user.id} value={user.id}>{user.username}</option>
+                        <option key={user.id} value={user.id}>{user.username} {user.isAdmin ? '(Admin)' : ''}</option>
                     ))}
                 </select>
                 <button onClick={handleUserSelect}>View Profile</button>
@@ -150,6 +177,7 @@ function Profile() {
                     <p><strong>Bio:</strong> {viewedUser.bio || 'No bio'}</p>
                     <p><strong>Joined:</strong> {new Date(viewedUser.createdAt).toLocaleString()}</p>
                     <p><strong>Followers:</strong> {followers.length}</p>
+                    <p><strong>Admin:</strong> {viewedUser.admin ? 'Yes' : 'No'}</p>
                 </div>
             </div>
             {isCurrentUserProfile ? (
@@ -162,6 +190,12 @@ function Profile() {
                 <div className="follow-buttons">
                     <button onClick={handleFollow}>Follow</button>
                     <button onClick={handleUnfollow}>Unfollow</button>
+                    {isAdmin && isNotSelfProfile && (
+                        <>
+                            <button onClick={handleMakeAdmin}>Make Administrator</button>
+                            <button onClick={handleDeleteUser}>Delete</button>
+                        </>
+                    )}
                 </div>
             )}
             {showBioForm && isCurrentUserProfile && (
